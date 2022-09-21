@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: "curl -f http://localhost:3306/"
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 7s
+    environment:
+      MYSQL_ROOT_PASSWORD: kosong
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_volume:/var/lib/mysql
+    networks:
+      - spring_net
+
+  config-service:
+    container_name: config-service
+    image: alamsn/config-service:v2
+    ports:
+      - "8088:8088"
+    healthcheck:
+      test: "curl -f http://localhost:8088/discovery-service/native/"
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 3s
+    environment:
+      - CONFIG_HOSTNAME=config-service
+      - DISCOVERY_HOSTNAME=discovery-service
+      - DATABASE=mysql
+    networks:
+      - spring_net
+    restart: always
+
+  discovery-service:
+    container_name: discovery-service
+    image: alamsn/discovery-service:v2
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: "curl -f http://localhost:8761/"
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    environment:
+      - CONFIG_HOSTNAME=config-service
+      - DISCOVERY_HOSTNAME=discovery-service
+    networks:
+      - spring_net
+    depends_on:
+      config-service:
+        condition: service_healthy
+    restart: always
+
+  gateway-service:
+    container_name: gateway-service
+    image: alamsn/gateway-service:v2
+    ports:
+      - "8081:8081"
+    environment:
+      - CONFIG_HOSTNAME=config-service
+      - DISCOVERY_HOSTNAME=discovery-service
+    networks:
+      - spring_net
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    restart: always
+
+  product-service:
+    container_name: product-service
+    image: alamsn/product-service:v2
+    ports:
+      - "8082:8082"
+    environment:
+      - CONFIG_HOSTNAME=config-service
+      - DISCOVERY_HOSTNAME=discovery-service
+      - DATABASE=mysql
+    networks:
+      - spring_net
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    restart: always
+
+  sales-service:
+    container_name: sales-service
+    image: alamsn/sales-service:v2
+    ports:
+      - "8083:8083"
+    environment:
+      - CONFIG_HOSTNAME=config-service
+      - DISCOVERY_HOSTNAME=discovery-service
+      - DATABASE=mysql
+    networks:
+      - spring_net
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    restart: always
+
+  app-client:
+    container_name: app-client
+    image: alamsn/clients:v2
+    ports:
+      - "8085:8085"
+    environment:
+      - CONFIG_HOSTNAME=config-service
+      - DISCOVERY_HOSTNAME=discovery-service
+    networks:
+      - spring_net
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  mysql_volume:
+networks:
+  spring_net:
+    driver: bridge

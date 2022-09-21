@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: app-client
+
+  config:
+    import: "optional:configserver:http://${CONFIG_HOSTNAME}:8088"
+
+eureka:
+  instance:
+    prefer-ip-address: true

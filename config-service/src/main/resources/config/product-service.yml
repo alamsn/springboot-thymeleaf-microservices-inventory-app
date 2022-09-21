@@ -1,0 +1,20 @@
+server:
+  port: 8082
+spring:
+  datasource:
+    username: root
+    password: kosong
+    url: jdbc:mysql://${DATABASE}:3306/db_product
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    show-sql: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${DISCOVERY_HOSTNAME}:8761/eureka/

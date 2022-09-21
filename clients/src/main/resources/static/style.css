@@ -1,0 +1,66 @@
+body {
+    background: #dedede;
+}
+.page-wrap {
+    min-height: 100vh;
+}
+
+#careers-wrapper{
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(300px, 1fr) );
+    grid-template-rows: auto;
+    gap:25px 25px;
+    line-height: 1.5;
+}
+#careers-wrapper .career-wrapper{
+    position: relative;
+    background-color: #560D0B;
+    padding: 25px;
+}
+#careers-wrapper .career-links ul{
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    align-content: start;
+    padding: 25px;
+}
+#careers-wrapper .career-links ul li{
+    flex: 1 0 auto;
+    margin: 7px;
+}
+
+#careers-wrapper .career-title > h1 {
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 20px;
+    text-transform: capitalize;
+}
+
+#careers-wrapper .career-content > p {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+#careers-wrapper .career-content {
+    padding-bottom: 5em;
+}
+
+#careers-wrapper .career-links {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#careers-wrapper .career-links li,
+#careers-wrapper .career-links a {
+    color: #fff;
+    text-decoration: none;
+    text-transform: capitalize;
+    font-size: 14px;
+}
